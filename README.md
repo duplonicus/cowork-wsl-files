@@ -15,6 +15,8 @@ That leaves WSL developers without Cowork for any of their code. Microsoft's own
 
 The feature request is [anthropics/claude-code#99303](https://github.com/anthropics/claude-code/issues/99303). It re-files [#61003](https://github.com/anthropics/claude-code/issues/61003), which a bot closed as stale with no maintainer response. Claude Desktop's Code tab does handle WSL folders; Cowork doesn't.
 
+Scheduled tasks hit the same wall: the "New scheduled task" form rejects a WSL folder as "a protected location". The Code tab's WSL sessions would be the way around that, but as of 2026-10-17 (Desktop 2.42304.0.0) they fail to start with "Couldn't upload to the remote (server binary) ... [ENOENT]" ([#101998](https://github.com/anthropics/claude-code/issues/101998)).
+
 Cowork can still use local MCP servers through Claude Desktop, and an MCP server can run inside WSL. This one does the file work there and hands Cowork the results.
 
 ### Why not the official filesystem server
