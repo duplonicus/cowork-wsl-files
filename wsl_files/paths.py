@@ -33,6 +33,33 @@ def roots() -> list[str]:
     return out
 
 
+def staging() -> str | None:
+    """The one Windows folder copy_to_windows / copy_from_windows may use (WSL path), or None when unset.
+    WSL_FILES_STAGING may be a Windows spelling (C:\\Users\\<user>\\Claude\\wsl-staging)."""
+    raw = os.environ.get("WSL_FILES_STAGING")
+    if not raw:
+        return None
+    m = _DRIVE.match(raw.strip())
+    p = f"/mnt/{m['drive'].lower()}{(m['rest'] or '/').replace(chr(92), '/')}" if m else raw
+    return os.path.realpath(os.path.expanduser(p))
+
+
+def resolve_staging(name: str) -> str:
+    """A file inside the staging folder, by name or relative path. Refuses anything that leaves it."""
+    st = staging()
+    if not st:
+        raise FilesError("No staging folder is set (WSL_FILES_STAGING), so copying to or from Windows is off.")
+    n = name.strip().strip('"').replace("\\", "/")
+    if m := _DRIVE.match(n):  # a full Windows path into the staging folder is fine too
+        n = f"/mnt/{m['drive'].lower()}{(m['rest'] or '/')}"
+    real = os.path.realpath(n if os.path.isabs(n) else os.path.join(st, n))
+    if not _inside(real, st) or real == st:
+        raise FilesError(f"{name} is not a file inside the staging folder {st}.")
+    if secret_path(real):
+        raise FilesError(f"{name} looks like a secrets file. This server never reads or writes those.")
+    return real
+
+
 def _wsl_drive() -> str:
     return (os.environ.get("WSL_FILES_WSL_DRIVE") or "W").upper()
 

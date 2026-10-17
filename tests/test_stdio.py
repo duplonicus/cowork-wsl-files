@@ -37,7 +37,8 @@ def test_stdio_roundtrip(tmp_path):
     assert init.serverInfo.name == "wsl-files"
     assert init.instructions and "WSL" in init.instructions
     assert {t.name for t in tools.tools} == {
-        "list_roots", "read_file", "write_file", "edit_file", "list_dir", "find_files", "search"}
+        "list_roots", "read_file", "write_file", "edit_file", "list_dir", "find_files", "search",
+        "copy_to_windows", "copy_from_windows"}
     read_only = {t.name for t in tools.tools if t.annotations.readOnlyHint}
     assert read_only == {"list_roots", "read_file", "list_dir", "find_files", "search"}
     (_, wrote), (_, edited), (_, read), (_, refused), (_, roots) = results

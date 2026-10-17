@@ -1,0 +1,5 @@
+# Copy to config.local (gitignored) and edit. Read by scripts/run-server.sh.
+# Folders the server may read and write, separated by ':'. Default ~/dev.
+# WSL_FILES_ROOTS=~/dev
+# A Windows folder for copy_to_windows / copy_from_windows (binary files). Unset = those tools are off.
+# WSL_FILES_STAGING='C:\Users\<user>\Claude\wsl-staging'   (single quotes: bash eats unquoted backslashes)

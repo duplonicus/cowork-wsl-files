@@ -10,3 +10,4 @@ logs/
 # local notes and agent worktrees
 /NOW.md
 .claude/
+config.local

@@ -39,8 +39,10 @@ If Anthropic ships WSL folders in Cowork, you won't need this.
 | `list_dir` | Lists a folder, up to 5 levels deep |
 | `find_files` | Finds files by glob (`*.md`, `docs/**/*.py`) |
 | `search` | Regex search through file contents |
+| `copy_to_windows` | Copies any file, binary too, into one Windows staging folder so the client's own tools can open it |
+| `copy_from_windows` | Copies a file from that staging folder back into WSL |
 
-There is no delete and no move, on purpose.
+There is no delete and no move, on purpose. Text tools can't handle binary files (docx, pdf, images); the two copy tools move those through the staging folder, and they're off unless `WSL_FILES_STAGING` is set.
 
 ## What it refuses
 
@@ -83,7 +85,9 @@ In `%APPDATA%\Claude\claude_desktop_config.json`, under `mcpServers`:
 
 Restart Claude Desktop afterwards.
 
-## Settings (environment variables)
+## Settings
+
+Put them in `config.local` in the repo folder (copy `config.example`). `scripts/run-server.sh` reads it. Environment variables set in the Claude Desktop config don't work here: they stay on the Windows side and `wsl.exe` doesn't pass them in.
 
 | Variable | Default | Meaning |
 |---|---|---|
@@ -91,3 +95,4 @@ Restart Claude Desktop afterwards.
 | `WSL_FILES_WSL_DRIVE` | `W` | Windows drive letter mapped to the WSL root |
 | `WSL_FILES_WINDOWS_USER` | `$USER` | User in `C:\Users\<user>\dev` |
 | `WSL_FILES_STATE` | `~/.local/state/wsl-files` | Where `changes.log` goes |
+| `WSL_FILES_STAGING` | unset (copy tools off) | Windows folder for the copy tools; a Windows spelling works |

@@ -7,7 +7,9 @@ import re
 import tempfile
 import time
 
-from .paths import SKIP_DIRS, FilesError, display, inside_roots, resolve
+import shutil
+
+from .paths import SKIP_DIRS, FilesError, display, inside_roots, resolve, resolve_staging
 from .secrets import redact, secret_path
 
 MAX_READ_BYTES = 2_000_000
@@ -254,3 +256,34 @@ def search(pattern: str, path: str = "", glob: str = "", ignore_case: bool = Fal
         return f"No matches for {pattern} under {display(real)}."
     cut = f"\n(stopped at {max_results} matches; narrow the path or glob)" if len(hits) >= max_results else ""
     return f"{len(hits)} match(es) under {display(base)}:\n" + "\n".join(hits) + cut
+
+
+MAX_COPY_BYTES = 500_000_000
+
+
+def _copy(src: str, dst: str, tool: str) -> str:
+    if not os.path.isfile(src):
+        raise FilesError(f"{display(src)} is not a file.")
+    if os.path.isdir(dst):
+        raise FilesError(f"{display(dst)} is a folder; give the file name too.")
+    size = os.path.getsize(src)
+    if size > MAX_COPY_BYTES:
+        raise FilesError(f"{display(src)} is {size:,} bytes, over the {MAX_COPY_BYTES:,}-byte copy limit.")
+    existed = os.path.exists(dst)
+    os.makedirs(os.path.dirname(dst), exist_ok=True)
+    tmp = dst + ".wsl-files-partial"
+    shutil.copyfile(src, tmp)
+    os.replace(tmp, dst)
+    log_change(tool, dst, {"from": src, "bytes": size, "replaced": existed})
+    return f"{'Replaced' if existed else 'Copied to'} {display(dst)} ({size:,} bytes, from {display(src)})."
+
+
+def copy_to_windows(path: str, name: str = "") -> str:
+    """Any file (binary too) from the roots into the staging folder, for the client to open there."""
+    src = resolve(path)
+    return _copy(src, resolve_staging(name or os.path.basename(src)), "copy_to_windows")
+
+
+def copy_from_windows(name: str, path: str) -> str:
+    """A file from the staging folder into the roots: how binary output (docx, pdf) gets back into WSL."""
+    return _copy(resolve_staging(name), resolve(path, write=True), "copy_from_windows")
