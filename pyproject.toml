@@ -3,6 +3,8 @@ name = "wsl-files"
 version = "0.1.0"
 description = "Local stdio MCP server: read and write files under ~/dev in WSL, for an MCP client that cannot reach WSL paths (Claude Cowork)"
 readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [{ name = "duplonicus" }]
 requires-python = ">=3.11"
 dependencies = [

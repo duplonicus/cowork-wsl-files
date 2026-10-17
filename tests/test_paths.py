@@ -25,9 +25,9 @@ def test_translate_windows_dev_junction(monkeypatch):
     home_dev = os.path.expanduser("~/dev")
     assert translate(r"C:\Users\someone\dev\proj\a.md") == home_dev + "/proj/a.md"
     assert translate(r"c:\users\SOMEONE\dev") == home_dev
-    # dev.claude is a different folder, not inside the junction
+    # a sibling folder whose name starts with "dev" is not inside the junction
     with pytest.raises(FilesError, match="outside ~/dev"):
-        translate(r"C:\Users\someone\dev.claude\NOW.md")
+        translate(r"C:\Users\someone\dev.other\notes.md")
     with pytest.raises(FilesError, match="outside ~/dev"):
         translate(r"D:\Models\x")
 

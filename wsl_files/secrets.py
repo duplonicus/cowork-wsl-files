@@ -1,5 +1,5 @@
-"""What counts as a secret. Copied from ~/.claude/hooks/guard.py (rule 6) so both
-places refuse the same files; change them together."""
+"""What counts as a secret: files refused by name, and key shapes redacted from output.
+Kept in step with the maintainer's Claude Code guard hook, so both refuse the same files."""
 
 import os
 import re

@@ -1,8 +1,32 @@
 # wsl-files
 
-A small local MCP server that lets an MCP client on Windows (Claude Desktop's Cowork, in particular) read and write files inside WSL. Cowork can't mount `\\wsl.localhost` folders; this server runs inside WSL and does the file work for it.
+A small local MCP server that lets Claude Desktop's Cowork, on Windows, read and write your files inside WSL.
 
-It runs over stdio, started by the client with `wsl.exe`.
+It runs inside WSL over stdio, and Claude Desktop starts it with `wsl.exe`.
+
+## Why this exists
+
+Cowork on Windows can't attach a folder that lives in a WSL distro. Every way in fails:
+
+- A `\\wsl.localhost\<distro>\...` subfolder is rejected up front: "Network (UNC) paths are not supported here."
+- The `\\wsl.localhost` folder itself, a mapped drive (`net use`), a `subst` drive, or a symlink in your Windows home folder: the picker accepts them, then the message fails with "Some folders couldn't be added."
+
+That leaves WSL developers without Cowork for any of their code. Microsoft's own advice is to keep projects on the Linux filesystem for speed ([WSL docs](https://learn.microsoft.com/en-us/windows/wsl/filesystems)).
+
+The feature request is [anthropics/claude-code#99303](https://github.com/anthropics/claude-code/issues/99303). It re-files [#61003](https://github.com/anthropics/claude-code/issues/61003), which a bot closed as stale with no maintainer response. Claude Desktop's Code tab does handle WSL folders; Cowork doesn't.
+
+Cowork can still use local MCP servers through Claude Desktop, and an MCP server can run inside WSL. This one does the file work there and hands Cowork the results.
+
+### Why not the official filesystem server
+
+[`@modelcontextprotocol/server-filesystem`](https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem) works, but two things made it a poor fit here:
+
+- **No server-side deny list.** Anything under an allowed folder is readable, `.env` files included; its `excludePatterns` is a per-call option for searches, chosen by the client. This server refuses secrets files outright and redacts key-shaped strings.
+- **The client can replace its folders.** Per its README, roots sent by the client "completely replace any server-side Allowed directories". Here the folders are fixed on the server side, whatever the client sends.
+
+This one also accepts the Windows spellings Cowork tends to send (`\\wsl.localhost\...`, `W:\...`, `C:\Users\<user>\dev\...`).
+
+If Anthropic ships WSL folders in Cowork, you won't need this.
 
 ## What it can do
 

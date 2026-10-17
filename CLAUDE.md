@@ -1,15 +1,15 @@
 # wsl-files
 
-Local stdio MCP server so Cowork (Claude Desktop) can read and write files under ~/dev in WSL. State and plans: `NOW.md` (in dev.claude/cowork-wsl-files; the folder names match, so no symlink).
+Local stdio MCP server so Cowork (Claude Desktop) can read and write files under ~/dev in WSL. Public repo.
 
 ## Rules
 
 - **Every path goes through `paths.resolve`**, and every walked file is checked with `inside_roots`. No tool touches the filesystem with a path that skipped those checks.
-- **`secrets.py` is a copy of guard.py rule 6** (`~/.claude/hooks/guard.py`). Change the two together.
-- **No delete or move tools.** That's the design; ask dup before adding either.
+- **`secrets.py` mirrors the maintainer's Claude Code guard hook** (not in this repo), so both refuse the same files. Keep them in step.
+- **No delete or move tools.** That's the design; don't add either without the maintainer's OK.
 - **Every tool returns a plain sentence on failure**, never a traceback.
 - stdout is the MCP channel in `server.py` and `scripts/run-server.sh`: print nothing there.
-- Tests use `tmp_path` roots and made-up content only.
+- Tests use `tmp_path` roots and made-up content only. No real user names, paths or IDs anywhere in the repo.
 
 ## Layout
 
